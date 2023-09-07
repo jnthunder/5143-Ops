@@ -1,8 +1,12 @@
 # 5143-Opsys-101
 
-# James Nealley
-## jtnealley0101@d2l.msutexas.edu
-## jnthunder@yahoo.com
+# Owner:  James Nealley
+## Purpose: CMPS 5143 course assignment repo
+### Primary: jtnealley0101@d2l.msutexas.edu
+### Alt: jnthunder@yahoo.com
 
 ### Image:
-<img src="[blob:https://d2l.msutexas.edu/90364d83-b9d5-459c-b5b2-11ad28699515](https://avatars.githubusercontent.com/u/117288245?v=4)https://avatars.githubusercontent.com/u/117288245?v=4" width="200">
+<img src="https://ca.slack-edge.com/TBMBG710S-U01EB7V6HME-8b63bbfe72d3-512" width="200">
+
+### Avatar:
+<img src="" width "50">
