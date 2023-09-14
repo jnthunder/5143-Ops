@@ -2,15 +2,17 @@ import
 
 def main():
   while True
-    command = input ("$ ")
-    if command == "exit":
+    Cmd = input ("$ ")
+    if Cmd == "exit":
       break
       print "BYE!":
 
-    elif command == "help":
+    elif Cmd == "help":
 
     else:
       execute_commands (Cmd)
 
 def execute_commands(Cmd):
+  while True
+    Cmd
 
