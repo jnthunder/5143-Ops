@@ -72,13 +72,33 @@ if __name__ == "__main__":
   print_cmd(cmd)                            # Print to terminal
 
   while True:
-    if char == '\x03' or cmd =='exit':      # control c
+    if char == '\x03' or cmd =='exit':      # Pressed 'Control + c' command
         raise SystemExit(" Goodbye!")       # raise and SystemExit are Base exception code products and
                                             # allow us to exit a program and provides a return to the system
     elif cmd == "CH":
-      print (CH())
+        print (CH())
 
-    elif char == '\x7f':                    # back space
-      cmd = cmd[:-1]
-      
+    elif char == '\x7f':                    # Pressed backspace button command
+        cmd = cmd[:-1]
+
+    elif char == '\x1b':                    # Pressed Arrow key (part of what is needed)
+        null = Getch()                      
+        direction = Getch()                 # Pulls the Unicode from the corresponding pressed arrow button
+
+        if direction in 'Uup':           # Up Arrow goes to previously entered command(s)
+            cmd += u"\u2191"
+            print_cmd(cmd)
+            sleep(0.5)
+            cmd = cmd[:-1]
+
+        if direction in 'Ddown':
+            cmd += u"\u2193"
+            print_cmd(cmd)
+            sleep(0.5)
+            cmd = cmd[:-1]
+
+        if  direction in 'Rright':
+            cmd = u"\u2192"
+            print_cmd(cmd)
+            cmd = cmd[:-1]
   
