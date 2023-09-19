@@ -121,3 +121,7 @@ if __name__ == "__main__":
         else:
             print ((" ERROR command %s doesn't exist") % (cmd))
             sleep (0.5)
+
+           ## YOUR CODE HERE
+            ## Parse the command
+            ## Figure out what your executing like finding pipes and redirects
