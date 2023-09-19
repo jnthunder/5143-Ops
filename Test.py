@@ -85,11 +85,11 @@ if __name__ == "__main__":
         null = Getch()                      
         direction = Getch()                 # Pulls the Unicode from the corresponding pressed arrow button
 
-        if direction in 'Uup':           # Up Arrow goes to previously entered command(s)
+        if direction in 'Uup':              # Up Arrow goes to previously entered command(s)
             cmd += u"\u2191"
             print_cmd(cmd)
             sleep(0.5)
-            cmd = cmd[:-1]
+            cmd = cmd[:-1]                  # Removes the arrow from the terminal after a the sleep time count
 
         if direction in 'Ddown':
             cmd += u"\u2193"
@@ -101,4 +101,21 @@ if __name__ == "__main__":
             cmd = u"\u2192"
             print_cmd(cmd)
             cmd = cmd[:-1]
-  
+
+        if direction in 'Lleft':
+            cmd = u"\u2190":
+            print_cmd(cmd)
+            sleep(0.5)
+            cmd = cmd[:-1]
+
+    """ If command exists, it is executed"""
+    elif char in '\r':
+         if CH.excists(cmd):                                    
+            CH.invoke(cmd = cmd, params = params, threads = False)
+            print_cmd(cmd)
+            sleep(0.5)
+
+    """ If command doesn't exist, the printout executes and shows the user the cmd attempted"""
+    else:
+          print (" ERROR command %s doesn't exist") % (cmd))
+          sleep (0'5)
