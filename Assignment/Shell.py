@@ -9,9 +9,10 @@ import os
 import sys
 from time import sleep
 from Getch import Getch
-#from Parse import ParseCmd, CmdParts
-from CMDP import *
-from cmdLS import ls
+#from CMDP import *
+from cmdLSL import LSL, LS
+from cmdPWD import PWD
+from cmdCD import CD
 
 
 ##################################################################################
