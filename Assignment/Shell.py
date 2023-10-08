@@ -1,5 +1,4 @@
 #!/usr/local/bin/python3
-#!/usr/bin/env python
 """
 This file is about using getch to capture input and handle certain keys 
 when the are pushed. The 'command_helper.py' was about parsing and calling functions.
