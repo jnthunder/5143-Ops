@@ -21,149 +21,27 @@ from cmdCD import CD
 # getch = Getch()                             # create instance of our getch class
 # prompt = "$"                               # set default prompt
 
-
-###################################### Getch #####################################
+###################################### print_cmd #################################
 ##################################################################################
 
-# class Getch:
+def PARSE(cmd):
+    flags = []
+    directives = []
+    params = []
+    cmd = cmd.split()
+    print(cmd)
+    for f in cmd:
+        if '--' in f:
+            directives.append(f.lstrip('--'))
+        elif '-' in f:
+            flags.append(f.lstrip('-'))
+        elif '/' in f:
+            params.append(f.lstrip('/'))
 
-#     def __init__(self):
-#         try:
-#             self.impl = _GetchWindows()
-#         except ImportError:
-#             self.impl = _GetchUnix()
+    return {'flags':''.join(flags),'directives':directives,'params':params}
 
-#     def __call__(self):
-#         return self.impl()
-
-# class _GetchUnix:
-#     def __init__(self):
-#         import tty
-#         import sys
-
-#     def __call__(self):
-#         import sys
-#         import tty
-#         import termios
-#         fd = sys.stdin.fileno()
-#         old_settings = termios.tcgetattr(fd)
-#         try:
-#             tty.setraw(sys.stdin.fileno())
-#             ch = sys.stdin.read(1)
-#         finally:
-#             termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
-#         return ch
-
-# class _GetchWindows:
-#     def __init__(self):
-#         import msvcrt
-
-#     def __call__(self):
-#         import msvcrt
-#         return msvcrt.getch()
-
-# if __name__=='__main__':
-#     G = Getch()
-
-#     while(G):
-#         pass
-
-
-###################################### CmdParts ##################################
+###################################### print_cmd #################################
 ##################################################################################
-
-class CmdParts:
-  """ This is the docs for CmdParts """
-  def __init__(self):
-      self.cmd = ''
-      self.directives = []
-      self.flags = []
-      self.params = []
-      self.stdin =  None
-
-  def __str__(self):
-      return (f"CmdParts: [cmd:{self.cmd} directives:{self.directives} params:{self.params}  flags:{self.flags} stdin:{self.stdin}]")
-
-
-###################################### ParseCmd ##################################
-##################################################################################
-
-class ParseCmd:
-  def __init__(self, cmd=None):
-    self.cmd = cmd
-    self.redirect = False
-    self.fileName = None
-    self.cmd_list = self.cmd.split()
-    self.cmd_len = len(self.cmd_list)
-    self.allCmds = []
-    self.run()
-
-  def run(self):
-    if not self.cmd:
-      return
-    
-    self.checkRedirect()
-    self.checkPipe()
-    self.parse()
-    
-  def parse(self):
-
-    allCmds = []                # list of all split commands
-
-    for cmd in self.cmd:        # for each cmd in the list of cmds
-      p = CmdParts()            # create an instance of the command class
-      cmd = cmd.split()         # split the individual command on spaces
-      p.cmd = cmd[0]            # pulls out the command from the split string 
-
-      # iterate over the rest of that command (which is really a list now)
-      for c in cmd[1:]:
-        if '-' in c:                    # Checks for '-' for identifying flag?
-          p.flags.append(c.lstrip('-'))
-        else:                           # else it's a parameter
-          p.params.append(c)
-
-      p.flags = ''.join(p.flags)        # make the flags list a simple string
-      self.allCmds.append(p)            # appends the object to a list
-#       # loop over each command and strip extra spaces away
-# i = 0
-# for cmd in cmds:
-#     cmds[i] = cmd.strip()
-#     i += 1
-# print(cmds)
-
-# # example dictionary showing processed commands
-# parts = {
-#     'cmd':'',
-#     'flags':'',
-#     'params':''
-# }
-        
-  def checkRedirect(self,cmd=None):
-    """ Checks if the command has a redirect (>) """
-    if not cmd:
-        cmd = self.cmd.strip()
-    elif '>' in self.cmd:               # confirms you redirect to a file
-        self.cmd = self.cmd.split('>')
-        self.redirect = True
-        self.fileName = self.cmd[-1]
-        self.cmd = self.cmd[0]
-    return self.cmd
-        
-
-  def checkPipe(self,cmd=None):
-    """ returns an array (list) of commands """
-    if not cmd:
-      cmd = self.cmd
-    if '|' in cmd:
-      # confirms you have a pipe
-      cmd = cmd.split('|')
-    else:
-      self.cmd = [cmd]
-      return [cmd]
-    self.cmd = cmd
-    return cmd 
- 
-
 
 def print_cmd(cmd):
     """ This function "cleans" off the command line, then prints
@@ -182,7 +60,7 @@ prompt = "$"                               # set default prompt
 
 if __name__ == '__main__':
     ParseCmd
-    CmdParts
+
     cmd = ""                                # empty cmd variable
     print_cmd(cmd)                          # print to terminal
     
@@ -237,8 +115,27 @@ if __name__ == '__main__':
         elif char in '\r':                  # return pressed 
             
             p = ParseCmd(cmd)
-            (f"{p.allCmds}")   
+            (f"{p.allCmds}")
 
+            # splits on spaces
+            print(cmd.split())
+
+            # check if redirect to std out is in the string
+            if '>' in cmd:
+                # confirms you redirect to a file
+                cmd = cmd.split('>')
+
+            print(cmd)
+
+            # split command if any `pipes` exist
+            cmds = cmd[0].split('|')
+
+            print(cmds)
+
+            # iterate over individual commands
+            for cmd in cmds:
+                print(cmd.split())
+    
             print("\n")
             for DS in p.allCmds:
                                 # if DS.cmd ():
@@ -260,18 +157,20 @@ if __name__ == '__main__':
                 #     LS(flags = 'DS.flags', params = 'DS.params')
 
                 elif DS.cmd == 'LSL':
+                    print(DS.cmd)
                     LSL()
 
                 elif DS.cmd == 'LS':
                     #if DS.flags == None:
                     LS(DS.flags)
-                    for DS.flags in['l','a','h']:
-                        if '-l' in DS.flags:
-                            print("doing a long listing")
-                        elif '-a' in DS.flags:
-                            print("printing hidden files")
-                        elif '-h' in DS.flags:
-                            print("human readable")
+                    
+                    # for DS.flags in['l','a','h']:
+                    #     if '-l' in DS.flags:
+                    #         print("doing a long listing")
+                    #     elif '-a' in DS.flags:
+                    #         print("printing hidden files")
+                    #     elif '-h' in DS.flags:
+                    #         print("human readable")
                 
                 elif DS.cmd == 'Ls':
                     ls()
@@ -314,6 +213,7 @@ if __name__ == '__main__':
                     CP()
 
                 elif DS.cmd == 'PWD':
+                    print(DS.cmd)
                     PWD()
 
                 elif DS.cmd == 'cp':
