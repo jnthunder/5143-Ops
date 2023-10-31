@@ -83,6 +83,8 @@ def print_cmd(cmd):
 
 if __name__ == '__main__':
     
+
+
     cmd = ""
     ht = ""                                # empty cmd variable
     H = 0
@@ -92,6 +94,7 @@ if __name__ == '__main__':
     with open("history.txt", "r") as ht:
         History = ht.readlines()
  
+
     print_cmd(cmd)                          # print to terminal
     
     while True:                             # loop forever
@@ -163,7 +166,7 @@ if __name__ == '__main__':
             updateHistory(cmd)              # History called and updated with cmd's
             p = ParseCmd(cmd)               # Parse is called and cmd's are broken down
             pdict = p.allCmdsDict
-            #print("\n", pdict)
+            PD = pdict
             for cmd in p.allCmds:           # pulls all cmd's from from Parser
                 pass
                 
@@ -175,6 +178,9 @@ if __name__ == '__main__':
                 
                 elif F_IT.cmd == 'cd':      # Change Directory
                     cd(**pdict)
+
+                elif F_IT.cmd == 'chMod':   # Change Mode
+                    chMod(**pdict)
 
                 elif F_IT.cmd == 'cp':      # Copy File
                     cp(**pdict)
@@ -191,14 +197,8 @@ if __name__ == '__main__':
                 elif F_IT.cmd == 'less':    # Less (Page at a time)
                     less(**pdict)
 
-                # elif F_IT.cmd == 'ls':
-                #     longListing(**pdict)
-
-                # elif F_IT.cmd == 'lsA':
-                #     ls(**pdict)
-
-                # elif F_IT.cmd == 'lsB':
-                #     lsA(**pdict)
+                elif F_IT.cmd == 'ls':
+                    ls(**pdict)
             
                 elif F_IT.cmd == 'mkDir':   # Make Directory
                     mkDir(**pdict)
@@ -209,8 +209,14 @@ if __name__ == '__main__':
                 elif F_IT.cmd == 'pwd':     # Current Working Directory
                     pwd(**pdict)
 
-                elif F_IT.cmd == 'rm':      # Remove Directory/File
+                elif F_IT.cmd == 'rm':      # Remove File
                     rm(**pdict)
+
+                elif F_IT.cmd == 'rm_RF':   # Remove directory with files inside it
+                    rm_RF(**pdict)
+
+                elif F_IT.cmd == 'rmDir':   # Remove Empty Directory
+                    rmDir(**pdict)
 
                 elif F_IT.cmd == 'tail':    # End of File
                     tail(**pdict)
@@ -219,6 +225,7 @@ if __name__ == '__main__':
                     wc(**pdict)
 
              #     sleep(1)    
+
 
             cmd = ""                        # reset command to nothing (since we just executed it)
             print_cmd(cmd)                  # now print empty cmd prompt
