@@ -1,27 +1,53 @@
 #!/usr/local/bin/python3
-"""
-This file is about using getch to capture input and handle certain keys 
-when the are pushed. The 'command_helper.py' was about parsing and calling functions.
-This file is about capturing the user input so that you can mimic shell behavior.
 
+################################# __HEADER__ #####################################
+##################################################################################
+# Advanced Operating Systems Shell
+#
+# Authors:  James Nealley
+#           Khetha Kunene
+#
+# Key Advisor:  Dr. Terry Griffin
+# 
+# Key Contributions:  Dr. Griffin (Getch, Parser and Shell Starter Code)
+#                     Bing AI, 'https://www.bing.com/'
+#                     Digital Ocean, 'https://www.digitalocean.com/community/tutorials'
+#                     flexiple, 'https://flexiple.com/python/python-append-to-string'
+#                     Free Code Camp, 'https://www.freecodecamp.org'
+#                     Geeks for Geeks, 'https://www.geeksforgeeks.org'
+#                     How to Forge, 'https://www.howtoforge.com/tutorial'
+#                     How-to Geak, 'https://www.howtogeek.com'
+#                     julia, 'https://docs.julialang.org/en/v1/stdlib/REPL/'
+#                     Learn Data Sci, 'https://www.learndatasci.com/solutions/python-move-file/'
+#                     Python 3.12.0 Documentation, 'https://docs.python.org'
+#                     Python for Beginners, 'https://www.pythonforbeginners.com/'
+#                     Real Python, 'https://realpython.com'
+#                     Stack Exchange, 'https://unix.stackexchange.com/'
+#
+# Search Engines:  bing
+#                  Firefox
+#                  Google
+#       
+#
+################################# __Shell__ ######################################
+##################################################################################
+
+"""
+This file is about using getch to capture input and handle certain keys when
+the are pushed. The 'command_helper.py' was about parsing and calling functions.
+This file is about capturing the user input so that you can mimic shell behavior.
 """
 import os
 import sys
 from time import sleep
 from Getch import Getch
-#from CMDP import *
-from cmdLSL import LSL, LS
-from cmdPWD import PWD
-from cmdCD import CD
+from Parse import ParseCmd
+from CMDP import *
 
+getch = Getch()                             # create instance of our getch class
+prompt = "$"                               # set default prompt
 
-##################################################################################
-##################################################################################
-
-# getch = Getch()                             # create instance of our getch class
-# prompt = "$"                               # set default prompt
-
-###################################### print_cmd #################################
+################################# Parse_cmd ######################################
 ##################################################################################
 
 def PARSE(cmd):
@@ -40,7 +66,7 @@ def PARSE(cmd):
 
     return {'flags':''.join(flags),'directives':directives,'params':params}
 
-###################################### print_cmd #################################
+################################# print_cmd ######################################
 ##################################################################################
 
 def print_cmd(cmd):
@@ -52,23 +78,31 @@ def print_cmd(cmd):
     sys.stdout.write("\r"+prompt+cmd)
     sys.stdout.flush()
 
-getch = Getch()                             # create instance of our getch class
-prompt = "$"                               # set default prompt
-
-##################################################################################
+################################### Main #########################################
 ##################################################################################
 
 if __name__ == '__main__':
-    ParseCmd
+    
 
-    cmd = ""                                # empty cmd variable
+
+    cmd = ""
+    ht = ""                                # empty cmd variable
+    H = 0
+    I = 0
+    open('history.txt', 'a')
+    createhistory                           # Creates history file
+    with open("history.txt", "r") as ht:
+        History = ht.readlines()
+ 
+
     print_cmd(cmd)                          # print to terminal
     
     while True:                             # loop forever
         char = getch()                      # read a character (but don't print)
 
         if char == '\x03' or cmd == 'exit': # ctrl-c
-            raise SystemExit(" Bye.")
+            #delete history file
+            raise SystemExit(" Bye!")
         
         elif char == '\x7f':                # back space pressed
             cmd = cmd[:-1]
@@ -82,22 +116,27 @@ if __name__ == '__main__':
                 # get the PREVIOUS command from your history (if there is one)
                 # prints out 'up' then erases it (just to show something)
                 cmd += u"\u2191"
+                H -= 1              # or H = H - 1 for decrementing 
+                cmd = History[H]
                 print_cmd(cmd)
-                sleep(0.3)
+                # sleep(0.3)
                 #cmd = cmd[:-1]
                 
             if direction in 'B':            # down arrow pressed
                 # get the NEXT command from history (if there is one)
                 # prints out 'down' then erases it (just to show something)
                 cmd += u"\u2193"
+                H += 1              # or H = H + 1 for incrementing
+                cmd = History[H]
                 print_cmd(cmd)
-                sleep(0.3)
+                #sleep(0.3)
                 #cmd = cmd[:-1]
             
             if direction in 'C':            # right arrow pressed    
                 # move the cursor to the right on your command prompt line
                 # prints out 'right' then erases it (just to show something)
                 cmd += u"\u2192"
+                cmd = input[:+1]
                 print_cmd(cmd)
                 sleep(0.3)
                 #cmd = cmd[:-1]
@@ -106,127 +145,84 @@ if __name__ == '__main__':
                 # moves the cursor to the left on your command prompt line
                 # prints out 'left' then erases it (just to show something)
                 cmd += u"\u2190"
-                print_cmd(cmd)
-                sleep(0.3)
+                input = ""
+                P = 0
+                i=0
+                for i in input:
+                    I += i
+                print('I')
+                print(I)
+                P -= 1
+#                cmd = I[P]
+                    
+                # print_cmd(cmd)
+                sleep(10.0)
                 #cmd = cmd[:-1]
             
-            print_cmd(cmd)                  # print the command (again)
+            #print_cmd(cmd)                 # print the command (again)
 
-        elif char in '\r':                  # return pressed 
+        # If no No arrows, delete or exit sequence, the commands are updated in history and processed
+        elif char in '\r':                   
+            updateHistory(cmd)              # History called and updated with cmd's
+            p = ParseCmd(cmd)               # Parse is called and cmd's are broken down
+            pdict = p.allCmdsDict
+            PD = pdict
+            for cmd in p.allCmds:           # pulls all cmd's from from Parser
+                pass
+                
+            # Loop to call all functions requested by the user
+            for F_IT in p.allCmds:
+
+                if F_IT.cmd == 'cat':       # Concantenate
+                    cat(**pdict)
+                
+                elif F_IT.cmd == 'cd':      # Change Directory
+                    cd(**pdict)
+
+                elif F_IT.cmd == 'chMod':   # Change Mode
+                    chMod(**pdict)
+
+                elif F_IT.cmd == 'cp':      # Copy File
+                    cp(**pdict)
+
+                elif F_IT.cmd == 'grep':    # Grep File
+                    grep(**pdict)
+
+                elif F_IT.cmd == 'head':    # Head of file
+                    head(**pdict)
+
+                elif F_IT.cmd == 'history': # History
+                    history(**pdict) 
+                                       
+                elif F_IT.cmd == 'less':    # Less (Page at a time)
+                    less(**pdict)
+
+                elif F_IT.cmd == 'ls':
+                    ls(**pdict)
             
-            p = ParseCmd(cmd)
-            (f"{p.allCmds}")
+                elif F_IT.cmd == 'mkDir':   # Make Directory
+                    mkDir(**pdict)
 
-            # splits on spaces
-            print(cmd.split())
+                elif F_IT.cmd == 'mv':      # Move File
+                    mv(**pdict)
 
-            # check if redirect to std out is in the string
-            if '>' in cmd:
-                # confirms you redirect to a file
-                cmd = cmd.split('>')
+                elif F_IT.cmd == 'pwd':     # Current Working Directory
+                    pwd(**pdict)
 
-            print(cmd)
+                elif F_IT.cmd == 'rm':      # Remove File
+                    rm(**pdict)
 
-            # split command if any `pipes` exist
-            cmds = cmd[0].split('|')
+                elif F_IT.cmd == 'rm_RF':   # Remove directory with files inside it
+                    rm_RF(**pdict)
 
-            print(cmds)
+                elif F_IT.cmd == 'rmDir':   # Remove Empty Directory
+                    rmDir(**pdict)
 
-            # iterate over individual commands
-            for cmd in cmds:
-                print(cmd.split())
-    
-            print("\n")
-            for DS in p.allCmds:
-                                # if DS.cmd ():
-                #     get.cmd()
-                if DS.cmd == 'CD': #and DS.directives == 'kwargs':
-                    print(cmd)
-                    CD()
-                    
-                    # params = DS.params
-                    # print(params)
-                    # print(DS.params)
-                    # CD(params) 
-                    
-                    
-                    #params = DS.params
-                    #CD()
-                    
-                # elif DS.cmd == 'LS':
-                #     LS(flags = 'DS.flags', params = 'DS.params')
+                elif F_IT.cmd == 'tail':    # End of File
+                    tail(**pdict)
 
-                elif DS.cmd == 'LSL':
-                    print(DS.cmd)
-                    LSL()
-
-                elif DS.cmd == 'LS':
-                    #if DS.flags == None:
-                    LS(DS.flags)
-                    
-                    # for DS.flags in['l','a','h']:
-                    #     if '-l' in DS.flags:
-                    #         print("doing a long listing")
-                    #     elif '-a' in DS.flags:
-                    #         print("printing hidden files")
-                    #     elif '-h' in DS.flags:
-                    #         print("human readable")
-                
-                elif DS.cmd == 'Ls':
-                    ls()
-                    # for DS.flags in['l','a','h']:
-                    #     if '-l' in DS.flags:
-                    #         print("doing a long listing")
-                    #     elif '-a' in DS.flags:
-                    #         print("printing hidden files")
-                    #     elif '-h' in DS.flags:
-                    #         print("human readable")
-                # elif DS.cmd == 'wc':
-                #         if 'l' in DS.flags:
-                #             print("printing num lines")       #kwargs=DS.cmd
-                    #len(DS.len)
-                    #LS(kwargs=LS(DS.flags))
-                    #LS(kwargs=LS(f"{p.allCmds}"))
-                    
-                    
-                    # DS.len = None
-                    #LS(DS.flags)
-
-
-                    # if ''in DS.flags:          #This prints for ls with or without flags
-                    #     print(os.system('ls'))
-                    # if 'l' in DS.flags:
-                    #     print(os.system('ls -l'))
-                    # if 'a' in DS.flags:
-                    #     print(os.system('ls -a'))
-                    # if 'h' in DS.flags:
-                    #     print(os.system('ls -h'))
-                    
-                elif DS.cmd == 'mkDir':
-                    mkDir()
-
-                elif DS.cmd == 'mv':
-                    if '' in DS.params:
-                        print(os.system('mv'))
-
-                elif DS.cmd == 'CP':
-                    CP()
-
-                elif DS.cmd == 'PWD':
-                    print(DS.cmd)
-                    PWD()
-
-                elif DS.cmd == 'cp':
-                    
-                    # if 'kwargs = [0]' in DS.params:
-                    print("now")
-                    print(os.system('cp'))
-                    # else:
-                    #     print("now1")    
-                
-                elif DS.cmd == 'wc':
-                    if 'l' in DS.flags:
-                        print("printing num lines")
+                elif F_IT.cmd == 'wc':      # Word Count
+                    wc(**pdict)
 
              #     sleep(1)    
 
