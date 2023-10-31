@@ -11,7 +11,7 @@ import shutil
 def cp(**kwargs):
 
     Cp = "" 
-    CP = kwargs.get('params')
+    CP = kwargs.get('params')       # pulls the list of params for the funtion to utilize
     P = CP
 
     first, *rest = P                # Each string placed against a variable
