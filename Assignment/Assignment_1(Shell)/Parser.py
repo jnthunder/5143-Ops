@@ -21,14 +21,15 @@ class CmdParts:
       self.flags = []
       self.params = []
       self.stdin =  None
+      self.pipe = False
 
   def __str__(self):
-      print (f"CmdParts: [cmd:{self.cmd}, directives:{self.directives}, params:{self.params}, flags:{self.flags}, stdin:{self.stdin}]")
-      print("done")
-      return (f"CmdParts: [cmd:{self.cmd}, directives:{self.directives}, params:{self.params}, flags:{self.flags}, stdin:{self.stdin}]")
+      # print (f"CmdParts: [cmd:{self.cmd}, directives:{self.directives}, params:{self.params}, flags:{self.flags}, stdin:{self.stdin}]")
+      # print("done")
+      return f"CmdParts: [cmd:{self.cmd}, directives:{self.directives}, params:{self.params}, flags:{self.flags}, stdin:{self.stdin}, pipe:{self.pipe}]"
   
-  # def __repr__(self):
-  #   return self.__str__()
+  def __repr__(self):
+    return self.__str__()
 
 ###################################### ParseCmd ##################################
 ##################################################################################
@@ -51,13 +52,18 @@ class ParseCmd:
     self.checkPipe()
     self.parse()
     
-  def parse(self):
-    
+  def parse(self, cmd = None):
+
     allCmds = []                # list of all split commands
     self.allCmdsDict = {'cmd':None, 'params':[],'flags':[],'directives':[]}
-  
+    #print(f"self.cmd: {self.cmd}")
+    i = 0
     for cmd in self.cmd:        # for each cmd in the list of cmds
       p = CmdParts()           # create an instance of the command class
+      if i < len(self.cmd) - 1:
+        p.pipe = True
+      i = i+1
+
       cmd = cmd.split()         # split the individual command on spaces
       p.cmd = cmd[0]            # pulls out the command from the split string 
       self.allCmdsDict['cmd'] = p.cmd
@@ -73,9 +79,9 @@ class ParseCmd:
 
       p.flags = ''.join(p.flags)        # make the flags list a simple string
       self.allCmds.append(p)            # appends the object to a list
-      return self.allCmdsDict
       
-        
+    return self.allCmdsDict
+            
   def checkRedirect(self,cmd=None):
       """ Checks if the command has a redirect (>) """
       if not cmd:
@@ -86,7 +92,6 @@ class ParseCmd:
         self.fileName = self.cmd[-1]
         self.cmd = self.cmd[0]
       return self.cmd
-        
 
   def checkPipe(self,cmd=None):
     """ returns an array (list) of commands """
