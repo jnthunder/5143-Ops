@@ -1,6 +1,6 @@
 """The sort command is a tool for sorting file contents and printing the result in standard output. Reordering a file's contents numerically 
     or alphabetically and arranging information in ascending or descending order.
-    commad sort [flag] filename has flags...
+    commad sort [flag] filename has flags...   
 """
 import csv
 
