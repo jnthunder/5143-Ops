@@ -11,45 +11,49 @@ import keyboard
 from Getch import Getch
 
 def less(**kwargs):
-    L = 0                               # Initialize L to 0
-    File = ""                           #Initialize File to a string
-    FILE = kwargs.get('params')         # Use 'file' instead of 'params' to get the file name
-    G = Getch()
-    C = curses.initscr()
-    curses.curs_set(0)                  # Hide the cursor
+    L = 0
+    File = ""
+    FILE = kwargs.get('params') # Use 'file' instead of 'params' to get the file name
+    G = Getch()                 # Sets the getch function to a variable
+    C = curses.initscr()        # sets curses.initscr to a variable
+    curses.curs_set(0)          # Hides the cursor while going through the pages
 
     for l in FILE:
         File += l
 
     try:
-        with open(File, 'r') as file:   # Open and read file line by line
+        with open(File, 'r') as file:   # Opens and reads file
             lines = file.readlines()
-    except FileNotFoundError:           # Error for incorrect file location or name
+
+    except FileNotFoundError:           # If the file name is either incorrect or not found
         print("File not found.")
         return
 
+    page_size = C.getmaxyx()[0]         # Number of lines that fit on one page
+    current_page = 0
+
     while True:
+        height, width = C.getmaxyx()    # determines how many lines are required
 
-        event = keyboard.read_event()
-        height, width = C.getmaxyx()    # retrieves the most current size of the terminal window
+        C.clear()
 
-        C.clear()                                       # Clear the screen before displaying new lines
+        start_line = current_page * page_size   # uses the pg size for each page by determining the start
+        end_line = start_line + height          # uses the pg size for each page by determining the end
 
-        for i in range(L, min(L + height, len(lines))): # Sets up the amount of lines to be viewed pwe page
+        for i in range(start_line, min(end_line, len(lines))):  # for loop for determining the above
             try:
-                C.addstr(i - L, 0, lines[i])
-            except curses.error:                    # Error handling for librabrary fuction miscues
-                pass  
+                C.addstr(i - start_line, 0, lines[i])
+            except curses.error:
+                pass
 
         C.refresh()
 
         ch = G()
-
-        if ch == event.event_type == 'esc':         # Press the escape key to exit
+        print(ch)
+        if ch == 'q':                           # when getch sees the q button is pressed it ends and closes the function
+            curses.curs_set(1)                  # cursor is reset/ready for next command
             break
-        elif ch == curses.KEY_DOWN:                 # Press the down arrow key to scroll down
-            L = min(L + 1, len(lines) - height)
-        elif ch == curses.KEY_UP:                   # Press the down arrow key to scroll
-            L = max(0, L - 1)
-    curses.endwin()
-    #curses.wrapper()
+        elif ch == 'n':                         # when n is pressed: the next page is retrieved
+            current_page = min(current_page + 1, len(lines) // page_size)
+        elif ch == 'm':                         # when n is pressed: the previous page is retrieved 
+            current_page = max(0, current_page - 1)
