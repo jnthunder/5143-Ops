@@ -8,21 +8,20 @@ def wc(**kwargs):
     # creating variable to store the
     # number of words
     number_of_words = 0
-    infileName = ""
-    lineCount = 0
-    byteCount = 0
-    D = kwargs.get('params')
-    for C in D:
-        infileName += C    
+    F = ""
+    Lines = 0
+    WC = kwargs.get('params')
+    F = WC[0]
+    # for C in WC:
+    #     F += C    
     
-    with open(infileName,'r') as file:
+    with open(F,'r') as file:
         #return the absolute path of the file
-        path = os.path.abspath(infileName)
+        path = os.path.abspath(F)
         #counts the bytes in the file
         byteCount = os.path.getsize(path)
-        print("Path: ", path)
-        print("File Name: ", infileName)
-        print("byteCount: ", byteCount)
+        #print("Path: ", path)
+        #print("File Name: ", F)
         # Reading the content of the file
         # using the read() function and storing
         # them in a new variable
@@ -30,14 +29,18 @@ def wc(**kwargs):
 
         # Splitting the data into separate lines
         # using the splitlines() function
-        lineCount = len(data.splitlines())
-        print("lineCount: ", lineCount)
+        Lines = len(data.splitlines())
+
         # Splitting the data into separate words
         # using the split() function
         words = len(data.split())
+        print("File Name: ", F)
+        print("Lines: ", Lines)
         print("words Count: ", words)
+        print()
+        return words
         # Printing total number of words
-        #print(lineCount, words, byteCount, infileName)
+        #print(Lines, words, F)
 
         
 if __name__=='__main__':
