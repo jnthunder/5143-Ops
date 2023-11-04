@@ -19,6 +19,8 @@
 #                     How-to Geak, 'https://www.howtogeek.com'
 #                     julia, 'https://docs.julialang.org/en/v1/stdlib/REPL/'
 #                     Learn Data Sci, 'https://www.learndatasci.com/solutions/python-move-file/'
+#                     List of Unicode Symbols, 'https://symbl.cc/en/unicode/table/'
+#                     PYnative Python Program, 'https://pynative.com/python-delete-files-and-directories/'
 #                     Python 3.12.0 Documentation, 'https://docs.python.org'
 #                     Python for Beginners, 'https://www.pythonforbeginners.com/'
 #                     Real Python, 'https://realpython.com'
@@ -167,64 +169,62 @@ if __name__ == '__main__':
             p = ParseCmd(cmd)               # Parse is called and cmd's are broken down
             pdict = p.allCmdsDict
             PD = pdict
+#            print(f"\ncmd: {p.allCmds}")
             for cmd in p.allCmds:           # pulls all cmd's from from Parser
-                pass
+                #pass
                 
-            # Loop to call all functions requested by the user
-            for F_IT in p.allCmds:
+                # Loop to call all functions requested by the user
+                for F_IT in p.allCmds:
 
-                if F_IT.cmd == 'cat':       # Concantenate
-                    cat(**pdict)
+                    if F_IT.cmd == 'cat':       # Concantenate
+                        stdin = cat(**pdict)
+                    
+                    elif F_IT.cmd == 'cd':      # Change Directory
+                        stdin = cd(**pdict)
+
+                    elif F_IT.cmd == 'chMod':   # Change Mode
+                        stdin = chmod(**pdict)
+
+                    elif F_IT.cmd == 'cp':      # Copy File
+                        stdin = cp(**pdict)
+
+                    elif F_IT.cmd == 'grep':    # Grep File
+                        stdin = grep(**pdict)
+
+                    elif F_IT.cmd == 'head':    # Head of file
+                        stdin = head(**pdict)
+
+                    elif F_IT.cmd == 'history': # History
+                        stdin = history(**pdict) 
+                                        
+                    elif F_IT.cmd == 'less':    # Less (Page at a time)
+                        stdin = less(**pdict)
+
+                    elif F_IT.cmd == 'ls':
+                        stdin = ls(**pdict)
                 
-                elif F_IT.cmd == 'cd':      # Change Directory
-                    cd(**pdict)
+                    elif F_IT.cmd == 'mkdir':   # Make Directory
+                        stdin = mkdir(**pdict)
 
-                elif F_IT.cmd == 'chMod':   # Change Mode
-                    chMod(**pdict)
+                    elif F_IT.cmd == 'mv':      # Move File
+                        stdin = mv(**pdict)
 
-                elif F_IT.cmd == 'cp':      # Copy File
-                    cp(**pdict)
+                    elif F_IT.cmd == 'pwd':     # Current Working Directory
+                        stdin = pwd(**pdict)
 
-                elif F_IT.cmd == 'grep':    # Grep File
-                    grep(**pdict)
+                    elif F_IT.cmd == 'rm':      # Remove File
+                        stdin = rm(**pdict)
 
-                elif F_IT.cmd == 'head':    # Head of file
-                    head(**pdict)
+                    elif F_IT.cmd == 'sort':    # Sort Strings
+                        stdin = sort(**pdict)
 
-                elif F_IT.cmd == 'history': # History
-                    history(**pdict) 
-                                       
-                elif F_IT.cmd == 'less':    # Less (Page at a time)
-                    less(**pdict)
+                    elif F_IT.cmd == 'tail':    # End of File
+                        stdin = tail(**pdict)
 
-                elif F_IT.cmd == 'ls':
-                    ls(**pdict)
-            
-                elif F_IT.cmd == 'mkDir':   # Make Directory
-                    mkDir(**pdict)
+                    elif F_IT.cmd == 'wc':      # Word Count
+                        stdin = wc(**pdict)
 
-                elif F_IT.cmd == 'mv':      # Move File
-                    mv(**pdict)
-
-                elif F_IT.cmd == 'pwd':     # Current Working Directory
-                    pwd(**pdict)
-
-                elif F_IT.cmd == 'rm':      # Remove File
-                    rm(**pdict)
-
-                elif F_IT.cmd == 'rm_RF':   # Remove directory with files inside it
-                    rm_RF(**pdict)
-
-                elif F_IT.cmd == 'rmDir':   # Remove Empty Directory
-                    rmDir(**pdict)
-
-                elif F_IT.cmd == 'tail':    # End of File
-                    tail(**pdict)
-
-                elif F_IT.cmd == 'wc':      # Word Count
-                    wc(**pdict)
-
-             #     sleep(1)    
+                sleep(1)    
 
 
             cmd = ""                        # reset command to nothing (since we just executed it)
