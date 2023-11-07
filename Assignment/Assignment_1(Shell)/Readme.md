@@ -4,6 +4,7 @@ Project 1: Shell
 How to utilize the codes developed for this shell
 
 | Name | Command |
+| ---- | ------- |
 | Concantinate | cat file file |
 cd path or .. or ~
 
