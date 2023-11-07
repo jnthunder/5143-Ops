@@ -5,18 +5,13 @@ How to utilize the codes developed for this shell
 
 | Name | Command |
 | ---- | ------- |
-| Concantinate | cat file file |
-cd path or .. or ~
-
-chmod ### file
-
-cp file destinationpath
-
-Grep word file
-
-head file # (of lines)
-
-history
+| Concantinate | cat file file (more files if desired) |
+| Change Directory | cd path (path must be in line with the current parent directories) |
+| Change Permissions | chmod ### file (numbers are a range between 0, 1, 4, 6 and 7 with zero's giving you an Error) |
+| Copy File | cp file destinationpath (Same as above for change directory rules concerning direct path) |
+| Grep | Grep word file |
+| Head | head file # (of lines you woruld like to veiw from the top of the selected file) |
+| History | history |
 
 less (for page up "n" and page down "m" and "q" to quit)
 
