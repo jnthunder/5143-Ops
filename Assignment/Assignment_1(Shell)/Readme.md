@@ -1,7 +1,35 @@
+Advanced Operating Systems
 Project 1: Shell
 
+Authors:  James Nealley
+          Khetha Kunene
+
+Key Advisor:  Dr. Terry Griffin
+
+Key Contributions:  Dr. Griffin (Getch, Parser and Shell Starter Code)
+                    Bing AI, 'https://www.bing.com/'
+                    ChatGPT, 'https://chat.openai.com/'
+                    Digital Ocean, 'https://www.digitalocean.com/community/tutorials'
+                    flexiple, 'https://flexiple.com/python/python-append-to-string'
+                    Free Code Camp, 'https://www.freecodecamp.org'
+                    Geeks for Geeks, 'https://www.geeksforgeeks.org'
+                    How to Forge, 'https://www.howtoforge.com/tutorial'
+                    How-to Geak, 'https://www.howtogeek.com'
+                    julia, 'https://docs.julialang.org/en/v1/stdlib/REPL/'
+                    Learn Data Sci, 'https://www.learndatasci.com/solutions/python-move-file/'
+                    List of Unicode Symbols, 'https://symbl.cc/en/unicode/table/'
+                    PYnative Python Program, 'https://pynative.com/python-delete-files-and-directories/'
+                    Python 3.12.0 Documentation, 'https://docs.python.org'
+                    Python for Beginners, 'https://www.pythonforbeginners.com/'
+                    Real Python, 'https://realpython.com'
+                    Stack Exchange, 'https://unix.stackexchange.com/'
+
+Search Engines:  bing
+                 Firefox
+                 Google
 
 How to utilize the codes developed for this shell
+
 
 | Name | Command | Information |
 | ---- | ------- | ----------- |
