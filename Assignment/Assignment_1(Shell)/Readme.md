@@ -3,8 +3,8 @@ Project 1: Shell
 
 How to utilize the codes developed for this shell
 
-cat file file 
-
+| Name | Command |
+| Concantinate | cat file file |
 cd path or .. or ~
 
 chmod ### file
