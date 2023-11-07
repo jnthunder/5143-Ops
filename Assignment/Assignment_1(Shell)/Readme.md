@@ -12,8 +12,7 @@ How to utilize the codes developed for this shell
 | Grep | Grep word file |
 | Head | head file # (of lines you woruld like to veiw from the top of the selected file) |
 | History | history |
-
-less (for page up "n" and page down "m" and "q" to quit)
+| Less | less (Page up "n", Page down "m", To exit "q" (Reads the size of the screen and breaks the file down into these portions for viewing)
 
 ls - l a h (any combo)
 
