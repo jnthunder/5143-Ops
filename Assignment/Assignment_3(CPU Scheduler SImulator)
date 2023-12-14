@@ -1,1 +1,536 @@
+# https://pypi.org/project/queuelib/#:~:text=Instantiate%20the%20Round%20Robin%20Queue%20similarly%20to%20the,%3E%3E%3E%20rr.pop%20%28%29%20b%27b%27%20%3E%3E%3E%20rr.pop%20%28%29%20b%27d%27
+# https://www.geeksforgeeks.org/python-os-path-dirname-method/
+# https://www.freecodecamp.org/news/how-to-read-files-in-python/
+# https://www.w3schools.com/python/python_file_write.asp
+# https://www.sqlitetutorial.net/sqlite-python/creating-database/
+# https://www.geeksforgeeks.org/queue-in-python/
+# https://www.geeksforgeeks.org/program-for-round-robin-scheduling-for-the-same-Arrival-time/
+# https://www.geeksforgeeks.org/deque-in-python/
+# https://www.geeksforgeeks.org/queue-in-python/
+# https://www.w3schools.com/python/python_for_loops.asp
+# https://www.geeksforgeeks.org/python-program-to-read-character-by-character-from-a-file/
 
+from datetime import datetime
+from time import sleep
+from rich.align import Align
+from rich.console import Console
+from rich.layout import Layout
+from rich.live import Live
+from rich.text import Text
+from rich.table import Table
+from rich.panel import Panel
+from rich.console import Group
+import random
+import json
+import sys,os
+
+import time
+from queue import Queue
+from collections import deque
+
+
+########        ###       ########       ###    
+##     ##      ## ##         ##         ## ##   
+##     ##     ##   ##        ##        ##   ##  
+##     ##    ##     ##       ##       ##     ## 
+##     ##    #########       ##       ######### 
+##     ##    ##     ##       ##       ##     ## 
+########     ##     ##       ##       ##     ## 
+
+
+class DATA:
+    
+    file_path = 'datafile.dat'
+
+    def __init__(self):
+        self.pid = 0
+        self.arrival = 0
+        self.burst = 0
+        self.priority = 0
+        self.start = 0
+        self.end = 0
+        self.wait = 0
+        self.cpuBursts = 0
+        self.ioBursts = 0
+        self.file_path = ""
+
+    @staticmethod
+    def read_file(file_path, start, queue):
+        with open(file_path, 'r') as F:
+            lines = F.readlines()
+            for process_data in lines:
+                process_data = process_data.strip()  # Remove '\n' at the end of each line
+                if len(process_data) > 0:
+                    parts = process_data.split(' ')
+                    arrival = int(parts[0])
+                    pid = int(parts[1])
+                    priority = parts[2]
+                    cpu_bursts = list(map(int, parts[3::2]))
+                    io_bursts = list(map(int, parts[4::2]))
+                    process_obj = Process(Arrival_Time=arrival, PID=pid, Priority=priority, CPU_Bursts=cpu_bursts, IO_Bursts=io_bursts)
+                    queue.put(process_obj)
+                    print(f"{arrival}, {pid}, {priority}, {cpu_bursts}, {io_bursts}")
+
+
+########     ########      #######      ######     ########     ######      ######  
+##     ##    ##     ##    ##     ##    ##    ##    ##          ##    ##    ##    ## 
+##     ##    ##     ##    ##     ##    ##          ##          ##          ##       
+########     ########     ##     ##    ##          ######       ######      ######  
+##           ##   ##      ##     ##    ##          ##                ##          ## 
+##           ##    ##     ##     ##    ##    ##    ##          ##    ##    ##    ## 
+##           ##     ##     #######      ######     ########     ######      ######  
+
+
+class Process:
+    def __init__(self, Arrival_Time, PID, Priority, CPU_Bursts, IO_Bursts):
+        self.Arrival_Time = Arrival_Time
+        self.PID = PID
+        self.Priority = Priority
+        self.CPU_Bursts = CPU_Bursts
+        self.IO_Bursts = IO_Bursts
+        self.CPUB_Time = 0
+        self.IOB_Time = 0        
+        self.currentBurstIndex = 0
+
+    def get_CPU_Bursts(self):
+        return self.CPU_Bursts
+
+    def get_IO_Bursts(self):
+        return self.IO_Bursts
+        
+    def get_next_CPU_Bursts(self):
+        if self.currentBurstIndex < len(self.CPU_Bursts):
+            print("\n\n CPU BEFORE Brust = ", self.CPU_Bursts)
+            self.CPUB_Time = self.CPU_Bursts[self.currentBurstIndex] #-= 1           
+
+            if self.CPUB_Time == 0:
+                del self.CPU_Bursts [0]
+                return 0
+            
+            else:
+                self.CPU_Bursts[self.currentBurstIndex] -= 1
+                self.CPUBURST = self.CPU_Bursts[self.currentBurstIndex]
+                return self.CPUBURST
+            
+        else:
+            return ISSUE  # No more CPU bursts
+        
+    def delete_zerod_CPUBurst(self):
+        del self.CPU_Bursts [0]
+
+    def get_next_IO_Bursts(self):
+        if self.currentBurstIndex < len(self.IO_Bursts): # - 1:
+            print("\n\n IO BEFORE Brust: ", self.IO_Bursts)            
+            self.IOB_Time = self.IO_Bursts[self.currentBurstIndex]# - 1
+
+            if self.IOB_Time == 0:
+                del self.IO_Bursts [0]
+                return 0
+
+            else:                        
+                self.IO_Bursts[self.currentBurstIndex] -= 1
+                self.IOBURST = self.IO_Bursts[self.currentBurstIndex]
+                return self.IOBURST
+
+        else:
+            return 0  # No more IO bursts
+        
+    def delete_zerod_IOBurst(self):
+        del self.IO_Bursts [0]
+        # print("WWWWWWW:" ,self.IO_Bursts())          (This is used to verify the list is empty)
+
+
+ #######     ##     ##    ########    ##     ##    ########    ####     ######  
+##     ##    ##     ##    ##          ##     ##    ##          ####    ##    ## 
+##     ##    ##     ##    ##          ##     ##    ##           ##     ##       
+##     ##    ##     ##    ######      ##     ##    ######      ##       ######  
+##  ## ##    ##     ##    ##          ##     ##    ##                        ## 
+##    ##     ##     ##    ##          ##     ##    ##                  ##    ## 
+ ##### ##     #######     ########     #######     ########             ######  
+
+
+class IOWait:
+    def __init__(self):
+        self.IOWait_queue = Queue()
+
+    def put(self, process):
+        self.IOWait_queue.put(process)
+
+    def get(self):
+        return self.IOWait_queue.get()
+
+    def is_empty(self):
+        return self.IOWait_queue.empty()
+
+class IO:
+    def __init__(self):
+        self.IO_queue = Queue()
+
+    def add_process(self, process):
+        self.IO_queue.put(process)
+
+    def is_empty(self):
+        return self.IO_queue.empty()
+
+class CPU:
+    def __init__(self):
+        self.CPU_queue = Queue()
+
+    def add_process(self, process):
+        self.CPU_queue.put(process)
+
+    def is_empty(self):
+        return self.CPU_queue.empty()
+
+class TerminateQueue:
+    def __init__(self):
+        self.queue = Queue()
+
+    def put(self, process):
+        self.queue.put(process)
+
+    def get(self):
+        return self.queue.get()
+
+    def is_empty(self):
+        return self.queue.empty()
+
+
+ ######      ######     ##     ##    ########    ########     ##     ##    ##          ########    ########  
+##    ##    ##    ##    ##     ##    ##          ##     ##    ##     ##    ##          ##          ##     ## 
+##          ##          ##     ##    ##          ##     ##    ##     ##    ##          ##          ##     ## 
+ ######     ##          #########    ######      ##     ##    ##     ##    ##          ######      ########  
+      ##    ##          ##     ##    ##          ##     ##    ##     ##    ##          ##          ##   ##   
+##    ##    ##    ##    ##     ##    ##          ##     ##    ##     ##    ##          ##          ##    ##  
+ ######      ######     ##     ##    ########    ########      #######     ########    ########    ##     ## 
+
+
+class Scheduler:
+    def __init__(self):#):
+        self.New_queue = Queue()
+        self.Ready_queue = deque()
+        self.IOWait_queue = Queue()
+        self.terminate_queue = TerminateQueue()
+        self.completed_processes = Queue()
+        self.CPUTime = 0
+        self.IOTime = 0        
+        self.CPU = CPU()
+        self.IO = IO()
+
+    
+
+    def load_processes(self, processes):
+        for process in processes:
+            self.New_queue.put(process)
+            #self.print_queue_contents()
+        print(f"Process {process.PID} added to the New queue")
+
+
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+##########################################################################################################
+
+
+    def run_scheduler(self, max_time_slices=25):   #the max_time_slice is still left here to be utilized for troubleshooting and can also be used if desired for other purposes
+        tick = 0
+        print("\nQUANTUM:", tick)            
+        self.handle_arrival(tick)
+        while self.New_queue.qsize() > 0 or len(self.Ready_queue) > 0 or not self.CPU.is_empty() or not self.IO.is_empty() or not self.IOWait_queue.empty(): # Remove this line to ustilze the max_time_slice method
+        #while not self.New_queue.empty() or not self.Ready_queue.empty() or not self.CPU.is_empty() or not self.IO.is_empty() or not self.IOWait_queue.empty():            
+        #while tick < max_time_slices:
+            tick += 1
+            print("\n-----------------------------------------------------------------------------------------")
+            print("QUANTUM:", tick)
+            
+            self.handle_arrival(tick)
+            self.handle_CPU(tick)
+            self.handle_IO(tick)
+            self.handle_termination(tick)
+            self.print_queue_contents()   # uesd for troubleshooting my code when it was placed here
+            sleep(0.1)   #This will become a variable to allow for speeding up or slowing down the system
+
+
+        self.print_queue_contents()
+
+    def print_queue_contents(self):
+        print("New Queue Contents:", [f"Process {process.PID}" for process in list(self.New_queue.queue)])
+
+        # Handle both Queue and deque cases for Ready Queue
+        if isinstance(self.Ready_queue, Queue):
+            print("Ready Queue Contents:", [f"Process {process.PID}" for process in list(self.Ready_queue.queue)])
+        elif isinstance(self.Ready_queue, deque):
+            print("Ready Queue Contents:", [f"Process {process.PID}" for process in list(self.Ready_queue)])
+
+        # Handle both Queue and deque cases for CPU Queue
+        if isinstance(self.CPU.CPU_queue, Queue):
+            print("CPU Queue Contents:", [f"Process {process.PID}" for process in list(self.CPU.CPU_queue.queue)])
+        elif isinstance(self.CPU.CPU_queue, deque):
+            print("CPU Queue Contents:", [f"Process {process.PID}" for process in list(self.CPU.CPU_queue)])
+
+        print("IO_wait Queue Contents:", [f"Process {process.PID}" for process in list(self.IOWait_queue.queue)])
+
+        # Handle both Queue and deque cases for IO Queue
+        if isinstance(self.IO.IO_queue, Queue):
+            print("IO Queue Contents:", [f"Process {process.PID}" for process in list(self.IO.IO_queue.queue)])
+        elif isinstance(self.IO.IO_queue, deque):
+            print("IO Queue Contents:", [f"Process {process.PID}" for process in list(self.IO.IO_queue)])
+
+        # Handle Queue case for Terminate Queue
+        if isinstance(self.terminate_queue.queue, Queue):
+            print("Terminate Queue Contents:", [f"Process {process.PID}" for process in list(self.terminate_queue.queue.queue)])
+        elif isinstance(self.terminate_queue.queue, deque):
+            print("Terminate Queue Contents:", [f"Process {process.PID}" for process in list(self.terminate_queue.queue)])
+
+        print("Completed Processes:", [f"Process {process.PID}" for process in list(self.completed_processes.queue)])
+
+
+ ######     ########     ##     ## 
+##    ##    ##     ##    ##     ## 
+##          ##     ##    ##     ## 
+##          ########     ##     ## 
+##          ##           ##     ## 
+##    ##    ##           ##     ## 
+ ######     ##            #######  
+
+ 
+    def handle_CPU(self, tick):
+        
+        if not self.CPU.is_empty():
+            process = self.CPU.CPU_queue.queue[0]  #This is where the variable is going to be implemented in order to use more than 1 CPU
+
+            if process.get_CPU_Bursts():
+                CPUBurst = process.get_next_CPU_Bursts()
+                print("CPU EXECUTING:",process.Arrival_Time, process.PID, process.Priority, CPUBurst)
+                self.CPUTime += 1
+                CPUTime = self.CPUTime
+                print("CPU BURSTS Remaining:", CPUBurst)
+                print("TIME in CPU:", CPUTime)
+                print("\n")
+                
+                if CPUBurst == 0:
+                    self.CPU.CPU_queue.get()
+                    process.delete_zerod_CPUBurst() #######################################
+
+                    if not process.get_IO_Bursts():
+                        self.terminate_queue.put(process)
+                        print(f"Process {process.PID} moved to Terminate Queue completed at time {tick}")
+                        print(f"Process {process.PID} removed from CPU")
+                        self.CPUTime = 0
+
+                    elif len(process.get_IO_Bursts()) > 0:
+                        self.IOWait_queue.put(process)
+                        print(f"Process {process.PID} moved to IO_Wait Queue completed at time {tick}")
+                        print(f"Process {process.PID} removed from CPU")
+                        self.CPUTime = 0
+                        self.printCPU_process_state(process)
+                    
+                    else:                                            
+                        self.IOWait_queue.put(process)
+                        print(f"Process {process.PID} moved to IOWait queue at time {tick}")
+                        print(f"Process {process.PID} removed from CPU")
+                        print("\n")
+                        self.CPUTime = 0
+                        self.printCPU_process_state(process)
+                        return process.CPU_Bursts[process.currentBurstIndex]
+
+                elif CPUBurst > 0:                 #is not None and CPUBurst > 0:  # Check if CPUBurst is not None before comparison
+                    CPUBurst -= 1
+                    #return process.CPU_Bursts[process.currentBurstIndex]
+
+                    if self.CPUTime == 5:
+                        print(f"Process {process.PID} preempted from CPU at time {tick}")
+                        self.CPU.CPU_queue.get(process)
+                        self.CPUTime = 0
+                        self.Ready_queue.append(process)
+                        print(f"Process {process.PID} moved to the end of the Ready queue")
+                        self.printCPU_process_state(process)                
+                        return process.CPU_Bursts[process.currentBurstIndex]
+                    
+                    else:
+                        self.printCPU_process_state(process)
+                        return process.CPU_Bursts[process.currentBurstIndex]
+
+                else:
+                    self.CPU.CPU_queue.get()
+                    self.terminate_queue.put(process)
+                    print(f"Process {process.PID} moved to Terminate Queue completed at time {tick}")
+                    print(f"Process {process.PID} removed from IO")
+                    self.IOTime = 0
+                    self.printLASTIO_process_state(process)
+                    return process.CPU_Bursts[process.currentBurstIndex]
+
+        elif self.Ready_queue:
+            process = self.Ready_queue.get()
+            self.CPU.add_process(process)
+            self.CPUTime = 0
+            print(f"Process {process.PID} moved to Ready from CPU at {tick}")
+            self.printCPU_process_state(process)            
+
+
+    ####     #######  
+    ##     ##     ## 
+    ##     ##     ## 
+    ##     ##     ## 
+    ##     ##     ## 
+    ##     ##     ## 
+    ####     #######  
+
+
+    def handle_IO(self, tick):
+
+        if not self.IO.is_empty():
+            process = self.IO.IO_queue.queue[0]   #This is where the variable is going to be implemented in order to use more than 1 IO
+
+            if process.get_IO_Bursts():
+                IOBurst = process.get_next_IO_Bursts()  # Use get_next_IO_Burst to get the next IO burst time
+                print("IO EXECUTING:", process.Arrival_Time, process.PID, process.Priority, IOBurst)
+                self.IOTime += 1
+                IOTime = self.IOTime
+                print("IO BURSTS Remaining:", IOBurst)
+                print("TIME in IO:", IOTime)
+                print("\n")
+                
+                if IOBurst == 0:
+                    self.IO.IO_queue.get()
+                    process.delete_zerod_IOBurst()    ############################################
+                    # print("ISSUE:::::::::::::", len(process.get_CPU_Bursts()))
+                    # print("ISSUE:::::::::::::", len(process.get_IO_Bursts()))
+
+                    if not process.get_CPU_Bursts():
+                        self.terminate_queue.put(process)
+                        print(f"Process {process.PID} moved to Terminate Queue completed at time {tick}")
+                        print(f"Process {process.PID} removed from IO")
+                        self.IOTime = 0
+
+                    elif len(process.get_CPU_Bursts()) > 0:
+                        self.Ready_queue.append(process)
+                        print(f"Process {process.PID} moved to Ready queue at time {tick}")
+                        print(f"Process {process.PID} removed from IO")
+                        self.IOTime = 0
+                        self.printIO_process_state(process)
+
+                    else:
+                        self.terminate_queue.put(process)
+                        print(f"Process {process.PID} moved to Terminate Queue completed at time {tick}")
+                        print(f"Process {process.PID} removed from IO")
+                        self.IOTime = 0
+                        self.printIO_process_state(process) 
+                                            
+                elif IOBurst > 0:                 #is not None and IOBurst > 0:  # Check if IOBurst is not None before comparison
+                    IOBurst -= 1
+                    #return process.IO_Bursts[process.currentBurstIndex]
+
+                    if self.IOTime == 5:
+                        print(f"Process {process.PID} preempted from IO at time {tick}")
+                        self.IO.IO_queue.get(process)
+                        self.IOTime = 0
+                        self.IOWait_queue.put(process)
+                        print(f"Process {process.PID} moved to the end of the IO_Wait queue")
+                        self.printIO_process_state(process)                
+                        return process.IO_Bursts[process.currentBurstIndex]
+                    
+                    else:
+                        self.printIO_process_state(process)
+                        return process.IO_Bursts[process.currentBurstIndex]
+
+                else:
+                    # Handle the case where IO_Bursts is empty
+                    print(f"Process {process.PID} has no more IO bursts.")
+                    self.IO.IO_queue.get()
+                    self.terminate_queue.put(process)
+                    print(f"Process {process.PID} moved to Terminate Queue completed at time {tick}")
+                    print(f"Process {process.PID} removed from IO")
+                    self.IOTime = 0
+                    self.printLASTIO_process_state(process)
+                    return process.IO_Bursts[process.currentBurstIndex]
+                
+        elif not self.IOWait_queue.empty():
+            process = self.IOWait_queue.get()
+            self.IO.add_process(process)
+            self.IOTime = 0
+            print(f"Process {process.PID} moved from IO_Wait to IO at: {tick}")
+            self.printIO_process_state(process)                            
+
+
+   ###       ########     ########     ####    ##     ##       ###       ##       
+  ## ##      ##     ##    ##     ##     ##     ##     ##      ## ##      ##       
+ ##   ##     ##     ##    ##     ##     ##     ##     ##     ##   ##     ##       
+##     ##    ########     ########      ##     ##     ##    ##     ##    ##       
+#########    ##   ##      ##   ##       ##      ##   ##     #########    ##       
+##     ##    ##    ##     ##    ##      ##       ## ##      ##     ##    ##       
+##     ##    ##     ##    ##     ##    ####       ###       ##     ##    ######## 
+ 
+ 
+    def handle_arrival(self, tick):
+        while not self.New_queue.empty() and self.New_queue.queue[0].Arrival_Time == tick:
+            process = self.New_queue.get()
+
+            # Place the newly arrived process in the Ready_queue
+            self.Ready_queue.append(process)
+            print(f"Process {process.PID} arrived at time {tick}")
+            print(f"Process {process.PID} moved to the Ready queue")
+
+        # Check if the CPU is empty and the Ready_queue is not empty
+        if self.CPU.is_empty() and self.Ready_queue:
+            process = self.Ready_queue.popleft()
+            self.CPU.add_process(process)
+            print(f"Process {process.PID} moved to the CPU from the Ready queue at time {tick}")
+            self.printREST_process_state(process)
+   
+    def printREST_process_state(self, process):
+        cpu_bursts = process.get_CPU_Bursts()
+        io_bursts = process.get_IO_Bursts()
+        print(f"Process state after burst: Arrival={process.Arrival_Time}, PID={process.PID}, Priority={process.Priority}, CPU_Bursts={process.get_CPU_Bursts()}, IO_Bursts={process.get_IO_Bursts()}")
+   
+    def printCPU_process_state(self, process):
+        cpu_bursts = process.get_CPU_Bursts()
+        io_bursts = process.get_IO_Bursts()
+        print(f"CPUBURST-New Process state: Arrival={process.Arrival_Time}, PID={process.PID}, Priority={process.Priority}, CPU_Bursts={process.get_CPU_Bursts()}, IO_Bursts={process.get_IO_Bursts()}")
+   
+    def printLASTCPU_process_state(self, process):
+        cpu_bursts = process.get_CPU_Bursts()
+        io_bursts = process.get_IO_Bursts()
+        print(f"CPUBURST-New Process state: Arrival={process.Arrival_Time}, PID={process.PID}, Priority={process.Priority}, CPU_Bursts=[]")
+
+    def printIO_process_state(self, process):
+        cpu_bursts = process.get_CPU_Bursts()
+        io_bursts = process.get_IO_Bursts()
+        print(f"IOBURST-New Process state: Arrival={process.Arrival_Time}, PID={process.PID}, Priority={process.Priority}, CPU_Bursts={process.get_CPU_Bursts()}, IO_Bursts={process.get_IO_Bursts()}")
+
+    def printLASTIO_process_state(self, process):
+        cpu_bursts = process.get_CPU_Bursts()
+        io_bursts = process.get_IO_Bursts()
+        print(f"IOBURST-New Process state: Arrival={process.Arrival_Time}, PID={process.PID}, Priority={process.Priority}, IO_Bursts= []")
+
+
+########    ########    ########     ##     ##    ####    ##    ##       ###       ########    ####     #######     ##    ## 
+   ##       ##          ##     ##    ###   ###     ##     ###   ##      ## ##         ##        ##     ##     ##    ###   ## 
+   ##       ##          ##     ##    #### ####     ##     ####  ##     ##   ##        ##        ##     ##     ##    ####  ## 
+   ##       ######      ########     ## ### ##     ##     ## ## ##    ##     ##       ##        ##     ##     ##    ## ## ## 
+   ##       ##          ##   ##      ##     ##     ##     ##  ####    #########       ##        ##     ##     ##    ##  #### 
+   ##       ##          ##    ##     ##     ##     ##     ##   ###    ##     ##       ##        ##     ##     ##    ##   ### 
+   ##       ########    ##     ##    ##     ##    ####    ##    ##    ##     ##       ##       ####     #######     ##    ## 
+
+
+    def handle_termination(self, tick):
+        while not self.terminate_queue.is_empty():
+            process = self.terminate_queue.get()  # Retrieve the item from the queue
+            print(f"Process {process.PID} completed at time {tick}")
+            self.completed_processes.put(process)
+
+
+##     ##       ###       ####    ##    ##    
+###   ###      ## ##       ##     ###   ##    
+#### ####     ##   ##      ##     ####  ##    
+## ### ##    ##     ##     ##     ## ## ##    
+##     ##    #########     ##     ##  ####    
+##     ##    ##     ##     ##     ##   ###    
+##     ##    ##     ##    ####    ##    ##    
+
+
+if __name__ == "__main__":
+    data = DATA()
+    scheduler = Scheduler()
+    data.read_file(DATA.file_path, 0, scheduler.New_queue)
+    scheduler.run_scheduler()
